@@ -1,0 +1,7 @@
+DEPENDENCIES
+  bsw_nginx
+    path: .
+    metadata: true
+
+GRAPH
+  bsw_nginx (0.1.0)

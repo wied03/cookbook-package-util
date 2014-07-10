@@ -1,7 +1,7 @@
 DEPENDENCIES
-  bsw_nginx
+  bsw_apt_baseline
     path: .
     metadata: true
 
 GRAPH
-  bsw_nginx (0.1.0)
+  bsw_apt_baseline (0.1.0)

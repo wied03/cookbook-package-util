@@ -19,8 +19,8 @@ module BswTech
         'thestagingenv'
       end
 
+      # Unlike other cookbooks we've written, we create the temp cookbook in our spec BEFORE calling this method
       def temp_lwrp_recipe(contents, runner_options={})
-        create_temp_cookbook contents
         RSpec.configure do |config|
           config.cookbook_path = [*config.cookbook_path] << generated_cookbook_path
         end

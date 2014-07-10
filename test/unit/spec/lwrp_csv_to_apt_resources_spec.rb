@@ -26,7 +26,7 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
       bsw_apt_baseline_csv_to_apt_resources 'test1.csv'
     EOF
     create_temp_cookbook lwrp
-    csv_path = File.join generated_cookbook_path, 'files', 'default', 'test1.csv'
+    csv_path = File.join cookbook_path, 'files', 'default', 'test1.csv'
     FileUtils.mkdir_p File.dirname(csv_path)
     CSV.open csv_path, 'w' do |csv|
       csv << ['package', 'repository', 'version']
@@ -40,8 +40,7 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
     # assert
     expect(@chef_run).to install_apt_package('bash').with_version('1.4.2')
     expect(@chef_run).to install_apt_package('openssl').with_version('1.5.2')
-    total_packages = @chef_run.find_resources 'apt'
+    total_packages = @chef_run.find_resources 'apt_package'
     expect(total_packages.length).to eq(2)
-    pending 'Write this test'
   end
 end

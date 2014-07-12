@@ -20,7 +20,7 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
     'csv_to_apt_resources'
   end
 
-  it 'parses the CSV and creates resources appropriately' do
+  it 'parses the CSV and creates resources appropriately when both are installed' do
     # arrange
     lwrp = <<-EOF
       bsw_apt_baseline_csv_to_apt_resources 'test1.csv'
@@ -33,14 +33,48 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
       csv << ['bash', 'amd64/trusty-security', '1.4.2']
       csv << ['openssl', 'amd64/trusty-security', '1.5.2']
     end
+    stub_command('dpkg-query -W bash').and_return(1)
+    stub_command('dpkg-query -W openssl').and_return(1)
 
     # act
     temp_lwrp_recipe lwrp
 
     # assert
-    expect(@chef_run).to install_apt_package('bash').with_version('1.4.2')
-    expect(@chef_run).to install_apt_package('openssl').with_version('1.5.2')
+    expect(@chef_run).to upgrade_apt_package('bash').with_version('1.4.2')
+    expect(@chef_run).to upgrade_apt_package('openssl').with_version('1.5.2')
     total_packages = @chef_run.find_resources 'apt_package'
     expect(total_packages.length).to eq(2)
+    total_packages.each do |pkg|
+      expect(pkg.action).to eq([:upgrade]), 'Need upgrade because we only upgrade something that is already there!'
+    end
+  end
+
+  it 'parses the CSV and creates resources appropriately when only 1 is installed' do
+    # arrange
+    lwrp = <<-EOF
+        bsw_apt_baseline_csv_to_apt_resources 'test1.csv'
+    EOF
+    create_temp_cookbook lwrp
+    csv_path = File.join cookbook_path, 'files', 'default', 'test1.csv'
+    FileUtils.mkdir_p File.dirname(csv_path)
+    CSV.open csv_path, 'w' do |csv|
+      csv << ['package', 'repository', 'version']
+      csv << ['bash', 'amd64/trusty-security', '1.4.2']
+      csv << ['openssl', 'amd64/trusty-security', '1.5.2']
+    end
+    stub_command('dpkg-query -W bash')
+    stub_command('dpkg-query -W openssl').and_return(1)
+
+    # act
+    temp_lwrp_recipe lwrp
+
+    # assert
+    expect(@chef_run).to_not upgrade_apt_package('bash')
+    expect(@chef_run).to upgrade_apt_package('openssl').with_version('1.5.2')
+    total_packages = @chef_run.find_resources 'apt_package'
+    expect(total_packages.length).to eq(2)
+    total_packages.each do |pkg|
+      expect(pkg.action).to eq([:upgrade]), 'Need upgrade because we only upgrade something that is already there!'
+    end
   end
 end

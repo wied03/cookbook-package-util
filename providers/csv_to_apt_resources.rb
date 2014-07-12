@@ -17,8 +17,11 @@ action :install do
   keys = parsed.shift
   packages = parsed.map { |a| Hash[keys.zip(a)] }
   packages.each do |pkg|
-    apt_package pkg['package'] do
+    package_name = pkg['package']
+    apt_package package_name do
+      action :upgrade
       version pkg['version']
+      only_if "dpkg-query -W #{package_name}"
     end
   end
 end

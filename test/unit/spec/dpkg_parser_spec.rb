@@ -21,7 +21,7 @@ describe BswTech::DpkgParser do
 
   it 'works with 1 installed package' do
     # arrange
-    output = 'ii  vim-tiny                         2:7.4.052-1ubuntu3    amd64                 Vi IMproved - enhanced vi editor - compact version'
+    output = 'vim-tiny ii'
 
     # act
     results = @parser.parse output
@@ -32,8 +32,8 @@ describe BswTech::DpkgParser do
 
   it 'works with multiple installed packages' do
     # arrange
-    output = 'ii  vim-tiny                         2:7.4.052-1ubuntu3    amd64                 Vi IMproved - enhanced vi editor - compact version
-    ii  w3m                              0.5.3-15              amd64                 WWW browsable pager with excellent tables/frames support
+    output = 'vim-tiny ii
+    w3m ii
     '
 
     # act
@@ -45,23 +45,24 @@ describe BswTech::DpkgParser do
 
   it 'works with rc packages' do
     # arrange
-    output = 'rc  rpcbind                          0.2.1-2ubuntu1        amd64                 converts RPC program numbers into universal addresses'
+    output = 'resource-agents ii
+    rpcbind rc'
 
     # act
     results = @parser.parse output
 
     # assert
-    expect(results).to be_empty
+    expect(results).to eq ['resource-agents']
   end
 
   it 'fails if we see a status we dont know' do
     # arrange
-    output = 'foo  rpcbind                          0.2.1-2ubuntu1        amd64                 converts RPC program numbers into universal addresses'
+    output = 'rpcbind foo'
 
     # act
     action = lambda { @parser.parse output }
 
     # assert
-    expect(action).to raise_exception 'Unknown status foo in dpkg -l output'
+    expect(action).to raise_exception "Unknown status 'foo' in dpkg-query -W -f='${binary:Package} ${db:Status-Abbrev}\\n' output"
   end
 end

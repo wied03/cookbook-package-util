@@ -13,10 +13,10 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
     cleanup
   }
 
-  def setup_command(command, output)
+  def setup_command(output)
     @shell_out = double()
     allow(Mixlib::ShellOut).to receive(:new)
-                               .with(command)
+                               .with("dpkg-query -W -f='${binary:Package} ${db:Status-Abbrev}\\n'")
                                .and_return(@shell_out)
     allow(@shell_out).to receive(:live_stream=)
     allow(@shell_out).to receive(:run_command)
@@ -36,8 +36,8 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
     lwrp = <<-EOF
       bsw_apt_baseline_csv_to_apt_resources 'test1.csv'
     EOF
-    setup_command 'dpkg -l','ii  bash                         2:7.4.052-1ubuntu3    amd64                 Vi IMproved - enhanced vi editor - compact version
-        ii  openssl                              0.5.3-15              amd64                 WWW browsable pager with excellent tables/frames support
+    setup_command 'bash ii
+        openssl ii
     '
     create_temp_cookbook lwrp
     csv_path = File.join cookbook_path, 'files', 'default', 'test1.csv'
@@ -66,7 +66,7 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
     lwrp = <<-EOF
         bsw_apt_baseline_csv_to_apt_resources 'test1.csv'
     EOF
-    setup_command 'dpkg -l','ii  openssl                         2:7.4.052-1ubuntu3    amd64                 Vi IMproved - enhanced vi editor - compact version
+    setup_command 'openssl ii
         '
     create_temp_cookbook lwrp
     csv_path = File.join cookbook_path, 'files', 'default', 'test1.csv'

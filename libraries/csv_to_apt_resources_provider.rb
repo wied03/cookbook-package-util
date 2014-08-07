@@ -1,3 +1,5 @@
+require 'csv'
+
 class Chef
   class Provider
     class BswAptBaselineCsvToAptResources < Chef::Provider
@@ -25,7 +27,7 @@ class Chef
 
       def action_install
         parser = BswTech::DpkgParser.new
-        result = shell_out 'dpkg -l'
+        result = shell_out "dpkg-query -W -f='${binary:Package} ${db:Status-Abbrev}\\n'"
         installed_packages = parser.parse result.stdout
         csv_path = cookbook_file_location @new_resource.csv_filename, @new_resource.cookbook_name
         parsed = CSV.read csv_path

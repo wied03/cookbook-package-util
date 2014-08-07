@@ -1,6 +1,8 @@
 class Chef
   class Provider
     class BswAptBaselineCsvToAptResources < Chef::Provider
+      include Chef::Mixin::ShellOut
+
       def initialize(new_resource, run_context)
         super
 
@@ -22,16 +24,22 @@ class Chef
       end
 
       def action_install
+        parser = BswTech::DpkgParser.new
+        result = shell_out 'dpkg -l'
+        installed_packages = parser.parse result.stdout
         csv_path = cookbook_file_location @new_resource.csv_filename, @new_resource.cookbook_name
         parsed = CSV.read csv_path
         keys = parsed.shift
         packages = parsed.map { |a| Hash[keys.zip(a)] }
         packages.each do |pkg|
           package_name = pkg['package']
-          apt_package package_name do
-            action :upgrade
-            version pkg['version']
-            only_if "dpkg-query -W #{package_name}"
+          if installed_packages.include? package_name
+            converge_by "Checking upgrade status for '#{package_name}'" do
+              apt_package package_name do
+                action :upgrade
+                version pkg['version']
+              end
+            end
           end
         end
       end

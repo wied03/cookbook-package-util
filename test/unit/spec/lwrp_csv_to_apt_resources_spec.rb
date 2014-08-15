@@ -54,8 +54,8 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
     # assert
     resource = @chef_run.find_resource('bsw_apt_baseline_csv_to_apt_resources', 'test1.csv')
     expect(resource.packages).to eq([
-                                        {:name => 'bash', :version => '1.4.2'},
-                                        {:name => 'openssl', :version => '1.5.2'},
+                                        {"package" => "bash", "repository" => "amd64/trusty-security", "version" => "1.4.2"},
+                                        {"package" => "openssl", "repository" => "amd64/trusty-security", "version" => "1.5.2"}
                                     ])
   end
 

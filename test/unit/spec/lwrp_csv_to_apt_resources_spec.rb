@@ -80,13 +80,7 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
     temp_lwrp_recipe lwrp
 
     # assert
-    expect(@chef_run).to upgrade_apt_package('bash').with_version('1.4.2')
-    expect(@chef_run).to upgrade_apt_package('openssl').with_version('1.5.2')
-    total_packages = @chef_run.find_resources 'apt_package'
-    expect(total_packages.length).to eq(2)
-    total_packages.each do |pkg|
-      expect(pkg.action).to eq([:upgrade]), 'Need upgrade because we only upgrade something that is already there!'
-    end
+    expect(@chef_run).to run_execute('sudo apt-get -q -y upgrade bash=1.4.2 openssl=1.5.2')
   end
 
   it 'parses the CSV and creates resources appropriately when only 1 is installed' do
@@ -109,12 +103,6 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
     temp_lwrp_recipe lwrp
 
     # assert
-    expect(@chef_run).to_not upgrade_apt_package('bash')
-    expect(@chef_run).to upgrade_apt_package('openssl').with_version('1.5.2')
-    total_packages = @chef_run.find_resources 'apt_package'
-    expect(total_packages.length).to eq(1)
-    total_packages.each do |pkg|
-      expect(pkg.action).to eq([:upgrade]), 'Need upgrade because we only upgrade something that is already there!'
-    end
+    expect(@chef_run).to run_execute('sudo apt-get -q -y upgrade openssl=1.5.2')
   end
 end

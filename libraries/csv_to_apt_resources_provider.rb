@@ -7,7 +7,6 @@ class Chef
 
       def initialize(new_resource, run_context)
         super
-
       end
 
       def whyrun_supported?
@@ -22,19 +21,15 @@ class Chef
 
       def action_install
         parser = BswTech::DpkgParser.new
-        result = shell_out "dpkg-query -W -f='${binary:Package} ${db:Status-Abbrev}\\n'"
+        result = shell_out "dpkg-query -W -f='${binary:Package} ${db:Status-Abbrev} ${Version}\\n'"
         installed_packages = parser.parse result.stdout
-        packages = @new_resource.packages
-        packages.each do |pkg|
-          package_name = pkg['package']
-          if installed_packages.include? package_name
-            converge_by "Checking upgrade status for '#{package_name}'" do
-              apt_package package_name do
-                action :upgrade
-                version pkg['version']
-              end
-            end
-          end
+        candidate_packages = @new_resource.packages.select do |candidate|
+          installed_packages.find { |p| p[:name] == candidate['package'] && p[:version] != candidate['version'] }
+        end
+        converge_by "Upgrading packages #{candidate_packages}" do
+          apt_syntax = candidate_packages.map { |p| "#{p['package']}=#{p['version']}" }
+          flat = apt_syntax.join ' '
+          execute "apt-get -q -y upgrade #{flat}"
         end
       end
     end

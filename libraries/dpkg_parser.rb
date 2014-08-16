@@ -2,12 +2,13 @@ module BswTech
   class DpkgParser
     def parse(command_output)
       results = []
-      command_output.scan(/(\S+) (\w+).*/) do |match|
+      command_output.scan(/(\S+)\s+(\w+)\s+(\S+)/) do |match|
         status = match[1]
         unless ['ii', 'rc'].include? status
-          fail "Unknown status '#{status}' in dpkg-query -W -f='${binary:Package} ${db:Status-Abbrev}\\n' output"
+          fail "Unknown status '#{status}' in dpkg-query output"
         end
-        results << match[0] if status == 'ii'
+        version = match[2]
+        results << {:name => match[0], :version => version} if status == 'ii'
       end
       results
     end

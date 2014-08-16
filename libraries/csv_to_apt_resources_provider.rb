@@ -23,6 +23,7 @@ class Chef
         parser = BswTech::DpkgParser.new
         result = shell_out "dpkg-query -W -f='${binary:Package} ${db:Status-Abbrev} ${Version}\\n'"
         installed_packages = parser.parse result.stdout
+        Chef::Log.debug "Currently installed packages - #{installed_packages}"
         candidate_packages = @new_resource.packages.select do |candidate|
           installed_packages.find { |p| p[:name] == candidate['package'] && p[:version] != candidate['version'] }
         end

@@ -80,7 +80,7 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
     temp_lwrp_recipe lwrp
 
     # assert
-    expect(@chef_run).to_not run_execute('apt-get -q -y upgrade bash=1.4.2 openssl=1.5.2')
+    expect(@chef_run).to_not run_execute(/apt-get.*/)
   end
 
   it 'upgrades 1 of the packages if its behind' do

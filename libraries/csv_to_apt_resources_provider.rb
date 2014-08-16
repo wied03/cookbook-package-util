@@ -26,6 +26,7 @@ class Chef
         candidate_packages = @new_resource.packages.select do |candidate|
           installed_packages.find { |p| p[:name] == candidate['package'] && p[:version] != candidate['version'] }
         end
+        return if candidate_packages.empty?
         converge_by "Upgrading packages #{candidate_packages}" do
           apt_syntax = candidate_packages.map { |p| "#{p['package']}=#{p['version']}" }
           flat = apt_syntax.join ' '

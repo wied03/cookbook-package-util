@@ -7,7 +7,6 @@ class Chef
 
       def initialize(new_resource, run_context)
         super
-
       end
 
       def whyrun_supported?
@@ -20,29 +19,19 @@ class Chef
         @current_resource
       end
 
-      def cookbook_file_location(source, cookbook_name)
-        cookbook = run_context.cookbook_collection[cookbook_name]
-        cookbook.preferred_filename_on_disk_location(node, :files, source)
-      end
-
       def action_install
         parser = BswTech::DpkgParser.new
-        result = shell_out "dpkg-query -W -f='${binary:Package} ${db:Status-Abbrev}\\n'"
+        result = shell_out "dpkg-query -W -f='${binary:Package} ${db:Status-Abbrev} ${Version}\\n'"
         installed_packages = parser.parse result.stdout
-        csv_path = cookbook_file_location @new_resource.csv_filename, @new_resource.cookbook_name
-        parsed = CSV.read csv_path
-        keys = parsed.shift
-        packages = parsed.map { |a| Hash[keys.zip(a)] }
-        packages.each do |pkg|
-          package_name = pkg['package']
-          if installed_packages.include? package_name
-            converge_by "Checking upgrade status for '#{package_name}'" do
-              apt_package package_name do
-                action :upgrade
-                version pkg['version']
-              end
-            end
-          end
+        Chef::Log.debug "Currently installed packages - #{installed_packages}"
+        candidate_packages = @new_resource.packages.select do |candidate|
+          installed_packages.find { |p| p[:name] == candidate['package'] && p[:version] != candidate['version'] }
+        end
+        return if candidate_packages.empty?
+        converge_by "Upgrading packages #{candidate_packages}" do
+          apt_syntax = candidate_packages.map { |p| "#{p['package']}=#{p['version']}" }
+          flat = apt_syntax.join ' '
+          execute "apt-get -q -y upgrade #{flat}"
         end
       end
     end

@@ -65,4 +65,19 @@ describe BswTech::DpkgParser do
     # assert
     expect(action).to raise_exception "Unknown status 'foo' in dpkg-query output"
   end
+
+  it 'works with architectures added to the package' do
+    # arrange
+    output = 'libapt-inst1.5:amd64 ii  1.0.1ubuntu2
+    libapt-pkg4.12:amd64 ii  1.0.1ubuntu2'
+
+    # act
+    results = @parser.parse output
+
+    # assert
+    expect(results).to eq([
+                              {:name => 'libapt-inst1.5', :version => '1.0.1ubuntu2'},
+                              {:name => 'libapt-pkg4.12', :version => '1.0.1ubuntu2'}
+                          ])
+  end
 end

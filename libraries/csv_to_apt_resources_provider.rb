@@ -2,21 +2,13 @@ require 'csv'
 
 class Chef
   class Provider
-    class BswAptBaselineCsvToAptResources < Chef::Provider
+    class BswAptBaselineCsvToAptResources < Chef::Provider::LWRPBase
       include Chef::Mixin::ShellOut
 
-      def initialize(new_resource, run_context)
-        super
-      end
+      use_inline_resources
 
       def whyrun_supported?
         true
-      end
-
-      def load_current_resource
-        @current_resource ||= Chef::Resource::BswAptBaselineCsvToAptResources.new(new_resource.name)
-        @current_resource.csv_filename(new_resource.csv_filename)
-        @current_resource
       end
 
       def action_install

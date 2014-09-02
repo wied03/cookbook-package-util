@@ -134,7 +134,7 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
     temp_lwrp_recipe lwrp
 
     # assert
-    expect(@chef_run).to run_execute('apt-get -q -y upgrade openssl=1.5.2')
+    expect(@chef_run).to run_execute('apt-get -y install openssl=1.5.2')
   end
 
   it 'upgrades both of the packages if they are both behind' do
@@ -158,7 +158,7 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
     temp_lwrp_recipe lwrp
 
     # assert
-    expect(@chef_run).to run_execute('apt-get -q -y upgrade bash=1.4.2 openssl=1.5.2')
+    expect(@chef_run).to run_execute('apt-get -y install bash=1.4.2 openssl=1.5.2')
   end
 
   it 'upgrades appropriately when only 1 is installed' do
@@ -181,6 +181,6 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
     temp_lwrp_recipe lwrp
 
     # assert
-    expect(@chef_run).to run_execute('apt-get -q -y upgrade openssl=1.5.2')
+    expect(@chef_run).to run_execute('apt-get -y install openssl=1.5.2')
   end
 end

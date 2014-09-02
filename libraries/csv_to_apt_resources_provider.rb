@@ -28,10 +28,10 @@ class Chef
           installed_packages.find { |p| p[:name] == candidate['package'] && p[:version] != candidate['version'] }
         end
         return if candidate_packages.empty?
-        converge_by "Upgrading packages #{candidate_packages}" do
+        converge_by "Installing packages #{candidate_packages}" do
           apt_syntax = candidate_packages.map { |p| "#{p['package']}=#{p['version']}" }
           flat = apt_syntax.join ' '
-          execute "apt-get -q -y upgrade #{flat}"
+          execute "apt-get -y install #{flat}"
         end
       end
     end

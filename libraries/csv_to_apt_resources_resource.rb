@@ -1,18 +1,15 @@
 class Chef
   class Resource
-    class BswAptBaselineCsvToAptResources < Chef::Resource
+    class BswAptBaselineCsvToAptResources < Chef::Resource::LWRPBase
+      actions :install
+      attribute :csv_filename, :kind_of => String, :name_attribute => true
+
+      self.resource_name = :bsw_apt_baseline_csv_to_apt_resources
+      self.default_action :install
+
       def initialize(name, run_context=nil)
         super
-        @resource_name = :bsw_apt_baseline_csv_to_apt_resources
-        @provider = Chef::Provider::BswAptBaselineCsvToAptResources
-        @action = :install
-        @allowed_actions = [:install]
-        csv_filename name
-      end
-
-      def csv_filename(arg=nil)
         @packages = nil
-        set_or_return(:csv_filename, arg, :kind_of => String)
       end
 
       def packages

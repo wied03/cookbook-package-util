@@ -2,6 +2,10 @@ DEPENDENCIES
   bsw_package_util
     path: .
     metadata: true
+  fake
+    path: test/fixtures/cookbooks/fake
 
 GRAPH
   bsw_package_util (0.1.0)
+  fake (1.0.0)
+    bsw_package_util (>= 0.0.0)

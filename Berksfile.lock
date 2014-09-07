@@ -1,7 +1,13 @@
 DEPENDENCIES
-  bsw_apt_baseline
+  bsw_package_util
     path: .
     metadata: true
+  fake
+    path: test/fixtures/cookbooks/fake
 
 GRAPH
-  bsw_apt_baseline (0.1.0)
+  apt (2.5.3)
+  bsw_package_util (0.1.0)
+  fake (1.0.0)
+    apt (>= 0.0.0)
+    bsw_package_util (>= 0.0.0)

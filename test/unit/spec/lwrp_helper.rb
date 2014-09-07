@@ -33,6 +33,7 @@ module BswTech
           allow(node).to receive(:chef_environment).and_return(env.name)
           allow(node).to receive(:environment).and_return(env.name)
           allow(Chef::Environment).to receive(:load).and_return(env)
+          node.automatic['platform_family'] = get_platform_family
         end
         @chef_run.converge("#{generated_cookbook_name}::default")
       end

@@ -1,7 +1,7 @@
 require 'csv'
 require_relative 'spec_helper'
 
-describe 'bsw_package_util::lwrp:package_util' do
+describe 'bsw_package_util::lwrp:package_util::ubuntu' do
   include BswTech::ChefSpec::LwrpTestHelper
 
   before {

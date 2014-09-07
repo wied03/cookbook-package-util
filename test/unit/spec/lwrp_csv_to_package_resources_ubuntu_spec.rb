@@ -31,6 +31,10 @@ describe 'bsw_package_util::lwrp:package_util::ubuntu' do
     'csv_to_package_resources'
   end
 
+  def get_platform_family
+    'debian'
+  end
+
   it 'allows a different name than the csv file' do
     # arrange
     lwrp = <<-EOF

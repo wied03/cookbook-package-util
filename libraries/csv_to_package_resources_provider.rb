@@ -2,7 +2,7 @@ require 'csv'
 
 class Chef
   class Provider
-    class BswAptBaselineCsvToAptResources < Chef::Provider::LWRPBase
+    class BswPackageUtilCsvToPackageResources < Chef::Provider::LWRPBase
       include Chef::Mixin::ShellOut
 
       use_inline_resources

@@ -1,7 +1,7 @@
 require 'csv'
 require_relative 'spec_helper'
 
-describe 'bsw_apt_baseline::lwrp:apt_baseline' do
+describe 'bsw_package_util::lwrp:package_util' do
   include BswTech::ChefSpec::LwrpTestHelper
 
   before {
@@ -24,17 +24,17 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
   end
 
   def cookbook_under_test
-    'bsw_apt_baseline'
+    'bsw_package_util'
   end
 
   def lwrps_under_test
-    'csv_to_apt_resources'
+    'csv_to_package_resources'
   end
 
   it 'allows a different name than the csv file' do
     # arrange
     lwrp = <<-EOF
-      bsw_apt_baseline_csv_to_apt_resources 'howdy' do
+      bsw_package_util_csv_to_package_resources 'howdy' do
         csv_filename 'test1.csv'
       end
     EOF
@@ -54,7 +54,7 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
     temp_lwrp_recipe lwrp
 
     # assert
-    resource = @chef_run.find_resource('bsw_apt_baseline_csv_to_apt_resources', 'howdy')
+    resource = @chef_run.find_resource('bsw_package_util_csv_to_package_resources', 'howdy')
     expect(resource.packages).to eq([
                                         {"package" => "bash", "repository" => "amd64/trusty-security", "version" => "1.4.2"},
                                         {"package" => "openssl", "repository" => "amd64/trusty-security", "version" => "1.5.2"}
@@ -64,7 +64,7 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
   it 'parses the CSV and loads the packages in the resource' do
     # arrange
     lwrp = <<-EOF
-          bsw_apt_baseline_csv_to_apt_resources 'test1.csv'
+          bsw_package_util_csv_to_package_resources 'test1.csv'
     EOF
     setup_command 'bash ii  1.4.2
             openssl ii  1.5.2
@@ -82,7 +82,7 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
     temp_lwrp_recipe lwrp
 
     # assert
-    resource = @chef_run.find_resource('bsw_apt_baseline_csv_to_apt_resources', 'test1.csv')
+    resource = @chef_run.find_resource('bsw_package_util_csv_to_package_resources', 'test1.csv')
     expect(resource.packages).to eq([
                                         {"package" => "bash", "repository" => "amd64/trusty-security", "version" => "1.4.2"},
                                         {"package" => "openssl", "repository" => "amd64/trusty-security", "version" => "1.5.2"}
@@ -92,7 +92,7 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
   it 'does not upgrade if both packages are already installed' do
     # arrange
     lwrp = <<-EOF
-        bsw_apt_baseline_csv_to_apt_resources 'test1.csv'
+        bsw_package_util_csv_to_package_resources 'test1.csv'
     EOF
     setup_command 'bash ii  1.4.2
           openssl ii  1.5.2
@@ -116,7 +116,7 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
   it 'upgrades 1 of the packages if its behind' do
     # arrange
     lwrp = <<-EOF
-        bsw_apt_baseline_csv_to_apt_resources 'test1.csv'
+        bsw_package_util_csv_to_package_resources 'test1.csv'
     EOF
     setup_command 'bash ii  1.4.2
           openssl ii  1.4.0
@@ -140,7 +140,7 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
   it 'upgrades both of the packages if they are both behind' do
     # arrange
     lwrp = <<-EOF
-          bsw_apt_baseline_csv_to_apt_resources 'test1.csv'
+          bsw_package_util_csv_to_package_resources 'test1.csv'
     EOF
     setup_command 'bash ii  1.4.0
             openssl ii  1.4.0
@@ -164,7 +164,7 @@ describe 'bsw_apt_baseline::lwrp:apt_baseline' do
   it 'upgrades appropriately when only 1 is installed' do
     # arrange
     lwrp = <<-EOF
-        bsw_apt_baseline_csv_to_apt_resources 'test1.csv'
+        bsw_package_util_csv_to_package_resources 'test1.csv'
     EOF
     setup_command 'openssl ii  1.4.0
         '

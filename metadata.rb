@@ -1,5 +1,5 @@
 # Encoding: utf-8
-name             'bsw_package_baseline'
+name             'bsw_package_util'
 maintainer       'BSW Technology Consulting LLC'
 maintainer_email 'support@bswtechconsulting.com'
 license          ''

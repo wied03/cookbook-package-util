@@ -1,7 +1,7 @@
 DEPENDENCIES
-  bsw_apt_baseline
+  bsw_package_util
     path: .
     metadata: true
 
 GRAPH
-  bsw_apt_baseline (0.1.0)
+  bsw_package_util (0.1.0)

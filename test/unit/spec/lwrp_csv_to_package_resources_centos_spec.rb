@@ -146,9 +146,10 @@ describe 'bsw_package_util::lwrp:package_util::centos' do
     lwrp = <<-EOF
           bsw_package_util_csv_to_package_resources 'test1.csv'
     EOF
-    setup_command 'bash 1.4.0
-            openssl 1.4.0
-        '
+    setup_command <<-EOF
+bash 1.4.0
+openssl 1.4.0
+EOF
     create_temp_cookbook lwrp
     csv_path = File.join cookbook_path, 'files', 'default', 'test1.csv'
     FileUtils.mkdir_p File.dirname(csv_path)

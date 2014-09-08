@@ -113,10 +113,27 @@ end
 
   it 'handles multiple keys' do
     # arrange
+    fetcher = double('key fetcher')
+    allow(BswTech::Hkp::KeyFetcher).to receive(:new).and_return fetcher
+    allow(fetcher).to receive(:fetch_key).with('keys.somehost.com', 'ABC').and_return 'foobar'
+    lwrp = <<-EOF
+        bsw_package_util_yum_repo 'repo1' do
+          yum_repo_settings proc {
+            gpgkey ['-----BEGIN PGP PUBLIC KEY BLOCK-----stufffdfgdsdgsg',{:key_server => 'keys.somehost.com', :key => 'ABC'}]
+          }
+        end
+    EOF
+    create_temp_cookbook lwrp
 
     # act
+    temp_lwrp_recipe lwrp
 
     # assert
-    pending 'Write this test'
+    resource = @chef_run.find_resource('yum_repository', 'repo1')
+    expect(resource).to_not be_nil
+    expect(resource.gpgkey).to eq(['/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1-1', '/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1-2'])
+    expect(@chef_run).to render_file('/etc/yum.repos.d/repo1.repo')
+    expect(@chef_run).to render_file('/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1-1').with_content('-----BEGIN PGP PUBLIC KEY BLOCK-----stufffdfgdsdgsg')
+    expect(@chef_run).to render_file('/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1-2').with_content('foobar')
   end
 end

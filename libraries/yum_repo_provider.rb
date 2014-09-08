@@ -7,33 +7,45 @@ class Chef
         true
       end
 
-      def key_path
-        ::File.join('/etc/pki/rpm-gpg', "RPM-GPG-KEY-#{@new_resource.name.upcase}")
+      def get_key_path(key_number)
+        suffix = "RPM-GPG-KEY-#{@new_resource.name.upcase}"
+        if key_number
+          suffix += "-#{key_number}"
+        end
+        ::File.join('/etc/pki/rpm-gpg', suffix)
       end
 
       def setup_keys(repo)
-        if repo.gpgkey
-          key = [*repo.gpgkey].first
-          key_base64 = nil
-          if key.is_a? Hash
-            fail "Hash #{key} must contain :key_server and :key" unless (key.keys - [:key_server, :key]).empty?
-            fetcher = BswTech::Hkp::KeyFetcher.new
-            key_base64 = fetcher.fetch_key(key_server=key[:key_server], key_id=key[:key])
-          elsif key.include? '-----BEGIN PGP PUBLIC KEY BLOCK-----'
-            key_base64 = key
-          elsif URI(key).scheme
-            remote_file key_path do
-              source key
+        keys = repo.gpgkey
+        if keys
+          key_array = [*keys]
+          multiple_keys = key_array.length > 1
+          key_paths = []
+          key_array.each_index do |index|
+            key = key_array[index]
+            key_path = get_key_path(multiple_keys ? index+1 : nil)
+            key_paths << key_path
+            key_base64 = nil
+            if key.is_a? Hash
+              fail "Hash #{key} must contain :key_server and :key" unless (key.keys - [:key_server, :key]).empty?
+              fetcher = BswTech::Hkp::KeyFetcher.new
+              key_base64 = fetcher.fetch_key(key_server=key[:key_server], key_id=key[:key])
+            elsif key.include? '-----BEGIN PGP PUBLIC KEY BLOCK-----'
+              key_base64 = key
+            elsif URI(key).scheme
+              remote_file key_path do
+                source key
+              end
+            else
+              fail "Don't know what to do with key #{key}"
             end
-          else
-            fail "Don't know what to do with key #{key}"
-          end
-          if key_base64
-            file key_path do
-              content key_base64
+            if key_base64
+              file key_path do
+                content key_base64
+              end
             end
           end
-          repo.gpgkey key_path
+          repo.gpgkey key_paths.length == 1 ? key_paths.first : key_paths
         end
       end
 

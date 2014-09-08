@@ -12,3 +12,9 @@ describe package('openssl') do
 
   it { should be_installed.with_version(expected_version) }
 end
+
+if os[:family] == 'RedHat'
+  describe package('postgresql93-libs') do
+    it { should be_installed }
+  end
+end

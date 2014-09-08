@@ -15,6 +15,10 @@ class Chef
         ::File.join('/etc/pki/rpm-gpg', suffix)
       end
 
+      def get_key_url(key_path)
+        "file://#{key_path}"
+      end
+
       def fetch_key_from_server(key)
         fail "Hash #{key} must contain :key_server and :key" unless (key.keys - [:key_server, :key]).empty?
         fetcher = BswTech::Hkp::KeyFetcher.new
@@ -49,7 +53,7 @@ class Chef
               end
             end
           end
-          repo.gpgkey key_paths.length == 1 ? key_paths.first : key_paths
+          repo.gpgkey key_paths.map { |kp| get_key_url kp }
         end
       end
 

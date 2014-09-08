@@ -59,7 +59,7 @@ end
     # assert
     resource = @chef_run.find_resource('yum_repository', 'repo1')
     expect(resource).to_not be_nil
-    expect(resource.gpgkey).to eq('/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1')
+    expect(resource.gpgkey).to eq(['file:///etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1'])
     expect(@chef_run).to render_file('/etc/yum.repos.d/repo1.repo')
     expect(@chef_run).to create_remote_file('/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1')
   end
@@ -84,7 +84,7 @@ end
     # assert
     resource = @chef_run.find_resource('yum_repository', 'repo1')
     expect(resource).to_not be_nil
-    expect(resource.gpgkey).to eq('/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1')
+    expect(resource.gpgkey).to eq(['file:///etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1'])
     expect(@chef_run).to render_file('/etc/yum.repos.d/repo1.repo')
     expect(@chef_run).to render_file('/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1').with_content('foobar')
   end
@@ -106,7 +106,7 @@ end
     # assert
     resource = @chef_run.find_resource('yum_repository', 'repo1')
     expect(resource).to_not be_nil
-    expect(resource.gpgkey).to eq('/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1')
+    expect(resource.gpgkey).to eq(['file:///etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1'])
     expect(@chef_run).to render_file('/etc/yum.repos.d/repo1.repo')
     expect(@chef_run).to render_file('/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1').with_content('-----BEGIN PGP PUBLIC KEY BLOCK-----stufffdfgdsdgsg')
   end
@@ -131,7 +131,7 @@ end
     # assert
     resource = @chef_run.find_resource('yum_repository', 'repo1')
     expect(resource).to_not be_nil
-    expect(resource.gpgkey).to eq(['/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1-1', '/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1-2'])
+    expect(resource.gpgkey).to eq(['file:///etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1-1', 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1-2'])
     expect(@chef_run).to render_file('/etc/yum.repos.d/repo1.repo')
     expect(@chef_run).to render_file('/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1-1').with_content('-----BEGIN PGP PUBLIC KEY BLOCK-----stufffdfgdsdgsg')
     expect(@chef_run).to render_file('/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1-2').with_content('foobar')

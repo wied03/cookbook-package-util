@@ -27,6 +27,7 @@ bsw_package_util_yum_repo 'repo1' do
   yum_repo_settings proc {
     baseurl 'http://www.something.com'
   }
+  gpg_keys 'http://www.google.com/ABC'
 end
     EOF
     create_temp_cookbook lwrp
@@ -47,8 +48,9 @@ end
     lwrp = <<-EOF
     bsw_package_util_yum_repo 'repo1' do
       yum_repo_settings proc {
-        gpgkey 'http://www.google.com/ABC'
-      }
+          baseurl 'http://www.something.com'
+        }
+      gpg_keys 'http://www.google.com/ABC'
     end
     EOF
     create_temp_cookbook lwrp
@@ -72,8 +74,9 @@ end
     lwrp = <<-EOF
         bsw_package_util_yum_repo 'repo1' do
           yum_repo_settings proc {
-            gpgkey [{:key_server => 'keys.somehost.com', :key => 'ABC'}]
+            baseurl 'http://www.something.com'
           }
+          gpg_keys ({:key_server => 'keys.somehost.com', :key => 'ABC'})
         end
     EOF
     create_temp_cookbook lwrp
@@ -94,8 +97,9 @@ end
     lwrp = <<-EOF
         bsw_package_util_yum_repo 'repo1' do
           yum_repo_settings proc {
-            gpgkey '-----BEGIN PGP PUBLIC KEY BLOCK-----stufffdfgdsdgsg'
+            baseurl 'http://www.something.com'
           }
+          gpg_keys '-----BEGIN PGP PUBLIC KEY BLOCK-----stufffdfgdsdgsg'
         end
     EOF
     create_temp_cookbook lwrp
@@ -121,8 +125,9 @@ end
     lwrp = <<-EOF
       bsw_package_util_yum_repo 'repo1' do
         yum_repo_settings proc {
-          gpgkey [{:file => 'key.pub'}]
+          baseurl 'http://www.something.com'
         }
+        gpg_keys({:file => 'key.pub'})
       end
     EOF
     create_temp_cookbook lwrp
@@ -156,8 +161,9 @@ end
     lwrp = <<-EOF
         bsw_package_util_yum_repo 'repo1' do
           yum_repo_settings proc {
-            gpgkey [{:cookbook => 'other_cookbook', :file => 'key.pub'}]
+            baseurl 'http://www.something.com'
           }
+          gpg_keys ({:cookbook => 'other_cookbook', :file => 'key.pub'})
         end
     EOF
     create_temp_cookbook lwrp
@@ -181,8 +187,9 @@ end
     lwrp = <<-EOF
         bsw_package_util_yum_repo 'repo1' do
           yum_repo_settings proc {
-            gpgkey ['-----BEGIN PGP PUBLIC KEY BLOCK-----stufffdfgdsdgsg',{:key_server => 'keys.somehost.com', :key => 'ABC'}]
+            baseurl 'http://www.something.com'
           }
+          gpg_keys ['-----BEGIN PGP PUBLIC KEY BLOCK-----stufffdfgdsdgsg',{:key_server => 'keys.somehost.com', :key => 'ABC'}]
         end
     EOF
     create_temp_cookbook lwrp

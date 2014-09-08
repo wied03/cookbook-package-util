@@ -26,9 +26,10 @@ class Chef
       end
 
       def setup_keys(repo)
-        keys = repo.gpgkey
+        keys = @new_resource.gpg_keys
         if keys
-          key_array = [*keys]
+          # Hash doesn't like making an array with [*]
+          key_array = keys.is_a?(Hash) ? [keys] : [*keys]
           multiple_keys = key_array.length > 1
           key_paths = []
           key_array.each_index do |index|

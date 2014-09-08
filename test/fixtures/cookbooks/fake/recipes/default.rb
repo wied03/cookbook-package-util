@@ -10,7 +10,8 @@ if platform_family == 'rhel'
   bsw_package_util_yum_repo 'pgsql' do
     yum_repo_settings proc {
       baseurl 'http://yum.postgresql.org/9.3/redhat/rhel-$releasever-$basearch'
-      gpgkey <<-EOF
+    }
+    gpg_keys <<-EOF
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: GnuPG v1.4.7 (GNU/Linux)
 
@@ -41,15 +42,14 @@ GaCXCY8h3xi6VIhJBBgRAgAJBQJHg/JKAhsMAAoJEB8W0uFELfD4K4cAoJ4yug8y
 1U0cZEiF5W25HDzMTtaDAKCaM1m3Cbd+AZ0NGWNg/VvIX9MsPA==
 =au6K
 -----END PGP PUBLIC KEY BLOCK-----
-      EOF
-    }
+    EOF
   end
 
   bsw_package_util_yum_repo 'epel' do
     yum_repo_settings proc {
       mirrorlist 'https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch'
-      gpgkey [{:file => 'epel.pub'}]
     }
+    gpg_keys({:file => 'epel.pub'})
   end
 
   package 'postgresql93-libs'

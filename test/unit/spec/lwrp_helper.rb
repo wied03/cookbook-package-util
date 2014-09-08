@@ -19,13 +19,21 @@ module BswTech
         'thestagingenv'
       end
 
+      def lwrps_full
+        [*lwrps_under_test].map do |lwrp|
+          "#{cookbook_under_test}_#{lwrp}"
+        end
+      end
+
+      def get_platform_family
+        'rhel' # default
+      end
+
       # Unlike other cookbooks we've written, we create the temp cookbook in our spec BEFORE calling this method
       def temp_lwrp_recipe(contents, runner_options={})
         RSpec.configure do |config|
           config.cookbook_path = [*config.cookbook_path] << generated_cookbook_path
-        end
-        lwrps_full = [*lwrps_under_test].map do |lwrp|
-          "#{cookbook_under_test}_#{lwrp}"
+          config.log_level = :debug
         end
         @chef_run = ::ChefSpec::Runner.new(runner_options.merge(step_into: lwrps_full)) do |node|
           env = Chef::Environment.new

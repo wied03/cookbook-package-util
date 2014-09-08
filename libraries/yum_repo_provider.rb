@@ -14,16 +14,23 @@ class Chef
       def setup_keys(repo)
         if repo.gpgkey
           key = [*repo.gpgkey].first
+          key_base64 = nil
           if key.is_a? Hash
             fail "Hash #{key} must contain :key_server and :key" unless (key.keys - [:key_server, :key]).empty?
             fetcher = BswTech::Hkp::KeyFetcher.new
             key_base64 = fetcher.fetch_key(key_server=key[:key_server], key_id=key[:key])
-            file key_path do
-              content key_base64
-            end
+          elsif key.include? '-----BEGIN PGP PUBLIC KEY BLOCK-----'
+            key_base64 = key
           elsif URI(key).scheme
             remote_file key_path do
               source key
+            end
+          else
+            fail "Don't know what to do with key #{key}"
+          end
+          if key_base64
+            file key_path do
+              content key_base64
             end
           end
           repo.gpgkey key_path

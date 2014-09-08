@@ -15,6 +15,12 @@ class Chef
         ::File.join('/etc/pki/rpm-gpg', suffix)
       end
 
+      def fetch_key_from_server(key)
+        fail "Hash #{key} must contain :key_server and :key" unless (key.keys - [:key_server, :key]).empty?
+        fetcher = BswTech::Hkp::KeyFetcher.new
+        fetcher.fetch_key(key_server=key[:key_server], key_id=key[:key])
+      end
+
       def setup_keys(repo)
         keys = repo.gpgkey
         if keys
@@ -27,9 +33,7 @@ class Chef
             key_paths << key_path
             key_base64 = nil
             if key.is_a? Hash
-              fail "Hash #{key} must contain :key_server and :key" unless (key.keys - [:key_server, :key]).empty?
-              fetcher = BswTech::Hkp::KeyFetcher.new
-              key_base64 = fetcher.fetch_key(key_server=key[:key_server], key_id=key[:key])
+              key_base64 = fetch_key_from_server key
             elsif key.include? '-----BEGIN PGP PUBLIC KEY BLOCK-----'
               key_base64 = key
             elsif URI(key).scheme

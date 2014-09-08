@@ -44,12 +44,24 @@ end
 
   it 'handles key URL' do
     # arrange
-
+    lwrp = <<-EOF
+    bsw_package_util_yum_repo 'repo1' do
+      yum_repo_settings proc {
+        gpgkey 'http://www.google.com/ABC'
+      }
+    end
+    EOF
+    create_temp_cookbook lwrp
 
     # act
+    temp_lwrp_recipe lwrp
 
     # assert
-    pending 'Write this test'
+    resource = @chef_run.find_resource('yum_repository', 'repo1')
+    expect(resource).to_not be_nil
+    expect(resource.gpgkey).to eq('/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1')
+    expect(@chef_run).to render_file('/etc/yum.repos.d/repo1.repo')
+    expect(@chef_run).to create_remote_file('/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1')
   end
 
   it 'handles key server' do
@@ -62,6 +74,15 @@ end
   end
 
   it 'handles a direct key' do
+    # arrange
+
+    # act
+
+    # assert
+    pending 'Write this test'
+  end
+
+  it 'handles multiple keys' do
     # arrange
 
     # act

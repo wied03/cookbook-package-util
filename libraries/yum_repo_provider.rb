@@ -13,8 +13,18 @@ class Chef
 
       def setup_keys(repo)
         if repo.gpgkey
-          remote_file key_path do
-            source repo.gpgkey
+          key = [*repo.gpgkey].first
+          if key.is_a? Hash
+            fail "Hash #{key} must contain :key_server and :key" unless (key.keys - [:key_server, :key]).empty?
+            fetcher = BswTech::Hkp::KeyFetcher.new
+            key_base64 = fetcher.fetch_key(key_server=key[:key_server], key_id=key[:key])
+            file key_path do
+              content key_base64
+            end
+          elsif URI(key).scheme
+            remote_file key_path do
+              source key
+            end
           end
           repo.gpgkey key_path
         end

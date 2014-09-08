@@ -17,4 +17,8 @@ if os[:family] == 'RedHat7'
   describe package('postgresql93-libs') do
     it { should be_installed }
   end
+
+  describe package('python-pip') do
+    it { should be_installed }
+  end
 end

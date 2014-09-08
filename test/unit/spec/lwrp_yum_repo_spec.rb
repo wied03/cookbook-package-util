@@ -121,7 +121,7 @@ end
     lwrp = <<-EOF
       bsw_package_util_yum_repo 'repo1' do
         yum_repo_settings proc {
-          gpgkey 'key.pub'
+          gpgkey [{:file => 'key.pub'}]
         }
       end
     EOF
@@ -136,16 +136,41 @@ end
     expect(resource.gpgkey).to eq(['file:///etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1'])
     expect(@chef_run).to render_file('/etc/yum.repos.d/repo1.repo')
     expect(@chef_run).to render_file('/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1').with_content('-----BEGIN PGP PUBLIC KEY BLOCK-----stufffdfgdsdgsg')
-    pending 'Write this test'
   end
 
-  it 'works with a cookbook supplied key with a custom source' do
+  it 'works with a cookbook supplied key with a different cookbook' do
     # arrange
+    other_cookbook_root = File.join(cookbook_path, '../other_cookbook')
+    file_path = File.join(other_cookbook_root, 'files/default/key.pub')
+    FileUtils.mkdir_p File.dirname(file_path)
+    File.open File.join(other_cookbook_root, 'metadata.rb'), 'w' do |file|
+      file << "name 'other_cookbook'\n"
+      file << "version '0.0.1'\n"
+    end
+    File.open File.join(cookbook_path, 'metadata.rb'), 'a+' do |file|
+      file << "depends 'other_cookbook'"
+    end
+    File.open file_path, 'w' do |file|
+      file << '-----BEGIN PGP PUBLIC KEY BLOCK-----stufffdfgdsdgsg'
+    end
+    lwrp = <<-EOF
+        bsw_package_util_yum_repo 'repo1' do
+          yum_repo_settings proc {
+            gpgkey [{:cookbook => 'other_cookbook', :file => 'key.pub'}]
+          }
+        end
+    EOF
+    create_temp_cookbook lwrp
 
     # act
+    temp_lwrp_recipe lwrp
 
     # assert
-    pending 'Write this test'
+    resource = @chef_run.find_resource('yum_repository', 'repo1')
+    expect(resource).to_not be_nil
+    expect(resource.gpgkey).to eq(['file:///etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1'])
+    expect(@chef_run).to render_file('/etc/yum.repos.d/repo1.repo')
+    expect(@chef_run).to render_file('/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1').with_content('-----BEGIN PGP PUBLIC KEY BLOCK-----stufffdfgdsdgsg')
   end
 
   it 'handles multiple keys' do

@@ -36,8 +36,15 @@ class Chef
             key_path = get_key_path(multiple_keys ? index+1 : nil)
             key_paths << key_path
             key_base64 = nil
-            if key.is_a? Hash
-              key_base64 = fetch_key_from_server key
+            if key.is_a?(Hash)
+              if key.include?(:key_server) && key.include?(:key)
+                key_base64 = fetch_key_from_server key
+              else
+                cookbook_file key_path do
+                  source key[:file]
+                  cookbook key[:cookbook] if key.include? :cookbook
+                end
+              end
             elsif key.include? '-----BEGIN PGP PUBLIC KEY BLOCK-----'
               key_base64 = key
             elsif URI(key).scheme
@@ -45,9 +52,7 @@ class Chef
                 source key
               end
             else
-              cookbook_file key_path do
-                source key
-              end
+              fail "Don't know what to do with key #{key}"
             end
             if key_base64
               file key_path do

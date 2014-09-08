@@ -45,5 +45,13 @@ GaCXCY8h3xi6VIhJBBgRAgAJBQJHg/JKAhsMAAoJEB8W0uFELfD4K4cAoJ4yug8y
     }
   end
 
+  bsw_package_util_yum_repo 'epel' do
+    yum_repo_settings proc {
+      mirrorlist 'https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch'
+      gpgkey [{:file => 'epel.pub'}]
+    }
+  end
+
   package 'postgresql93-libs'
+  package 'python-pip'
 end

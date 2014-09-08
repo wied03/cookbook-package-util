@@ -18,7 +18,7 @@ class Chef
       end
 
       def get_installed_packages_rhel
-        command = shell_out "rpm -qa --queryformat \"%{NAME} %{VERSION}\\n\""
+        command = shell_out "rpm -qa --queryformat \"%{NAME} %{VERSION}-%{R}\\n\""
         results = []
         command.stdout.scan(/(\S+) (\S+)/) do |match|
           results << {

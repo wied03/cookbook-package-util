@@ -16,7 +16,7 @@ describe 'bsw_package_util::lwrp:package_util::centos' do
   def setup_command(output)
     @shell_out = double()
     allow(Mixlib::ShellOut).to receive(:new)
-                               .with("rpm -qa --queryformat \"%{NAME} %{VERSION}\\n\"")
+                               .with("rpm -qa --queryformat \"%{NAME} %{VERSION}-%{R}\\n\"")
                                .and_return(@shell_out)
     allow(@shell_out).to receive(:live_stream=)
     allow(@shell_out).to receive(:run_command)

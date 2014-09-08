@@ -111,6 +111,43 @@ end
     expect(@chef_run).to render_file('/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1').with_content('-----BEGIN PGP PUBLIC KEY BLOCK-----stufffdfgdsdgsg')
   end
 
+  it 'works with a cookbook supplied key' do
+    # arrange
+    file_path = File.join(cookbook_path, 'files/default/key.pub')
+    FileUtils.mkdir_p File.dirname(file_path)
+    File.open file_path, 'w' do |file|
+      file << '-----BEGIN PGP PUBLIC KEY BLOCK-----stufffdfgdsdgsg'
+    end
+    lwrp = <<-EOF
+      bsw_package_util_yum_repo 'repo1' do
+        yum_repo_settings proc {
+          gpgkey 'key.pub'
+        }
+      end
+    EOF
+    create_temp_cookbook lwrp
+
+    # act
+    temp_lwrp_recipe lwrp
+
+    # assert
+    resource = @chef_run.find_resource('yum_repository', 'repo1')
+    expect(resource).to_not be_nil
+    expect(resource.gpgkey).to eq(['file:///etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1'])
+    expect(@chef_run).to render_file('/etc/yum.repos.d/repo1.repo')
+    expect(@chef_run).to render_file('/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1').with_content('-----BEGIN PGP PUBLIC KEY BLOCK-----stufffdfgdsdgsg')
+    pending 'Write this test'
+  end
+
+  it 'works with a cookbook supplied key with a custom source' do
+    # arrange
+
+    # act
+
+    # assert
+    pending 'Write this test'
+  end
+
   it 'handles multiple keys' do
     # arrange
     fetcher = double('key fetcher')

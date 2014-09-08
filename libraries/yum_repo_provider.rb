@@ -45,7 +45,9 @@ class Chef
                 source key
               end
             else
-              fail "Don't know what to do with key #{key}"
+              cookbook_file key_path do
+                source key
+              end
             end
             if key_base64
               file key_path do

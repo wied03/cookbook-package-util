@@ -141,6 +141,8 @@ end
     expect(resource.gpgkey).to eq(['file:///etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1'])
     expect(@chef_run).to render_file('/etc/yum.repos.d/repo1.repo')
     expect(@chef_run).to render_file('/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1').with_content('-----BEGIN PGP PUBLIC KEY BLOCK-----stufffdfgdsdgsg')
+    resource = @chef_run.find_resource('bsw_package_util_yum_repo', 'repo1')
+    expect(resource.gpg_keys).to eq({:cookbook => 'lwrp_gen', :file => 'key.pub'})
   end
 
   it 'works with a cookbook supplied key with a different cookbook' do
@@ -177,6 +179,8 @@ end
     expect(resource.gpgkey).to eq(['file:///etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1'])
     expect(@chef_run).to render_file('/etc/yum.repos.d/repo1.repo')
     expect(@chef_run).to render_file('/etc/pki/rpm-gpg/RPM-GPG-KEY-REPO1').with_content('-----BEGIN PGP PUBLIC KEY BLOCK-----stufffdfgdsdgsg')
+    resource = @chef_run.find_resource('bsw_package_util_yum_repo', 'repo1')
+    expect(resource.gpg_keys).to eq({:cookbook => 'other_cookbook', :file => 'key.pub'})
   end
 
   it 'handles multiple keys' do

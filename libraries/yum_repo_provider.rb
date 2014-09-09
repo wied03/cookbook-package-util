@@ -41,9 +41,11 @@ class Chef
               if key.include?(:key_server) && key.include?(:key)
                 key_base64 = fetch_key_from_server key
               else
+                # Ensure our keys attribute always has a cookbook name on it
+                key[:cookbook] ||= @new_resource.cookbook_name.to_s
                 cookbook_file key_path do
                   source key[:file]
-                  cookbook key[:cookbook] if key.include? :cookbook
+                  cookbook key[:cookbook]
                 end
               end
             elsif key.include? '-----BEGIN PGP PUBLIC KEY BLOCK-----'

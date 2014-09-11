@@ -16,7 +16,7 @@ class Chef
       end
 
       def get_key_url(key_path)
-        "file://#{key_path}"
+        key_path =~ URI::regexp ? key_path : "file://#{key_path}"
       end
 
       def fetch_key_from_server(key)
@@ -50,9 +50,15 @@ class Chef
               end
             elsif key.include? '-----BEGIN PGP PUBLIC KEY BLOCK-----'
               key_base64 = key
-            elsif URI(key).scheme
-              remote_file key_path do
-                source key
+            elsif key =~ URI::regexp
+              scheme = URI(key).scheme
+              if scheme == 'file'
+                # we already have a URL, so place it in paths
+                key_paths[-1] = key
+              else
+                remote_file key_path do
+                  source key
+                end
               end
             else
               fail "Don't know what to do with key #{key}"

@@ -117,6 +117,31 @@ describe 'bsw_package_util::lwrp:package_util::centos' do
     expect(@chef_run).to_not run_execute(/yum.*/)
   end
 
+  it 'does not upgrade if 2 versions of a package are installed and one is our target' do
+    # arrange
+    lwrp = <<-EOF
+            bsw_package_util_csv_to_package_resources 'test1.csv'
+    EOF
+    setup_command 'bash 1.4.2
+              openssl 1.5.2
+              openssl 1.3.2
+          '
+    create_temp_cookbook lwrp
+    csv_path = File.join cookbook_path, 'files', 'default', 'test1.csv'
+    FileUtils.mkdir_p File.dirname(csv_path)
+    CSV.open csv_path, 'w' do |csv|
+      csv << ['package', 'repository', 'version']
+      csv << ['bash', 'amd64/trusty-security', '1.4.2']
+      csv << ['openssl', 'amd64/trusty-security', '1.5.2']
+    end
+
+    # act
+    temp_lwrp_recipe lwrp
+
+    # assert
+    expect(@chef_run).to_not run_execute(/yum.*/)
+  end
+
   it 'upgrades 1 of the packages if its behind' do
     # arrange
     lwrp = <<-EOF
@@ -149,7 +174,7 @@ describe 'bsw_package_util::lwrp:package_util::centos' do
     setup_command <<-EOF
 bash 1.4.0
 openssl 1.4.0
-EOF
+    EOF
     create_temp_cookbook lwrp
     csv_path = File.join cookbook_path, 'files', 'default', 'test1.csv'
     FileUtils.mkdir_p File.dirname(csv_path)

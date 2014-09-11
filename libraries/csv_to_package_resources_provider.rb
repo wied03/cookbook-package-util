@@ -61,7 +61,9 @@ class Chef
         installed_packages = get_installed_packages
         Chef::Log.debug "Currently installed packages - #{installed_packages}"
         candidate_packages = @new_resource.packages.select do |candidate|
-          installed_packages.find { |p| p[:name] == candidate['package'] && p[:version] != candidate['version'] }
+          existing_versions = installed_packages.select { |p| p[:name] == candidate['package'] }
+          # This provider only upgrades packages that are already installed
+          existing_versions.any? && existing_versions.all? { |p| p[:version] != candidate['version'] }
         end
         return if candidate_packages.empty?
         converge_by "Installing packages #{candidate_packages}" do

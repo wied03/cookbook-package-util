@@ -13,6 +13,10 @@ describe package('openssl') do
   it { should be_installed.with_version(expected_version) }
 end
 
+describe file('/tmp/csv_ran') do
+  it { should contain 'csv did run!' }
+end
+
 if os[:family] == 'RedHat7'
   describe package('postgresql93-libs') do
     it { should be_installed }
@@ -20,5 +24,9 @@ if os[:family] == 'RedHat7'
 
   describe package('python-pip') do
     it { should be_installed }
+  end
+
+  describe file('/tmp/notify_me') do
+    it { should contain 'i am here' }
   end
 end

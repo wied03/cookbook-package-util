@@ -4,7 +4,14 @@ if platform_family == 'debian'
   include_recipe 'apt::default'
 end
 
-bsw_package_util_csv_to_package_resources file_name
+file '/tmp/csv_ran' do
+  action :nothing
+  content 'csv did run!'
+end
+
+bsw_package_util_csv_to_package_resources file_name do
+  notifies :create, 'file[/tmp/csv_ran]', :delayed
+end
 
 if platform_family == 'rhel'
   bsw_package_util_yum_repo 'pgsql' do
@@ -50,6 +57,12 @@ GaCXCY8h3xi6VIhJBBgRAgAJBQJHg/JKAhsMAAoJEB8W0uFELfD4K4cAoJ4yug8y
       mirrorlist 'https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch'
     }
     gpg_keys({:file => 'epel.pub'})
+    notifies :create, 'file[/tmp/notify_me]', :delayed
+  end
+
+  file '/tmp/notify_me' do
+    action :nothing
+    content 'i am here'
   end
 
   package 'postgresql93-libs'

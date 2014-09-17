@@ -19,12 +19,11 @@ class Chef
           # This provider only upgrades packages that are already installed
           existing_versions.any? && existing_versions.all? { |p| p[:version] != candidate['version'] }
         end
-        return if candidate_packages.empty?
+        next if candidate_packages.empty?
         converge_by "Installing packages #{candidate_packages}" do
           install_packages candidate_packages
         end
       end
-
 
       private
 

@@ -7,6 +7,17 @@ class Chef
         true
       end
 
+      action :create do
+        id = @new_resource.name
+        repo = yum_repository @new_resource.name do
+          description "Repository for #{id}"
+        end
+        repo.instance_eval(&@new_resource.yum_repo_settings)
+        setup_keys repo
+      end
+
+      private
+
       def get_key_path(key_number)
         suffix = "RPM-GPG-KEY-#{@new_resource.name.upcase}"
         if key_number
@@ -71,15 +82,6 @@ class Chef
           end
           repo.gpgkey key_paths.map { |kp| get_key_url kp }
         end
-      end
-
-      def action_create
-        id = @new_resource.name
-        repo = yum_repository @new_resource.name do
-          description "Repository for #{id}"
-        end
-        repo.instance_eval(&@new_resource.yum_repo_settings)
-        setup_keys repo
       end
     end
   end

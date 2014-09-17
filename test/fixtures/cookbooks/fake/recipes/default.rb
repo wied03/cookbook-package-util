@@ -13,7 +13,10 @@ bsw_package_util_csv_to_package_resources file_name do
   notifies :create, 'file[/tmp/csv_ran]', :delayed
 end
 
+
 if platform_family == 'rhel'
+  bsw_package_util_csv_to_package_resources 'already_there.csv'
+
   bsw_package_util_yum_repo 'pgsql' do
     yum_repo_settings proc {
       baseurl 'http://yum.postgresql.org/9.3/redhat/rhel-$releasever-$basearch'

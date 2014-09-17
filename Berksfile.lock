@@ -6,10 +6,10 @@ DEPENDENCIES
     path: test/fixtures/cookbooks/fake
 
 GRAPH
-  apt (2.5.3)
-  bsw_gpg (0.1.5)
+  apt (2.6.0)
+  bsw_gpg (0.2.1)
   bsw_package_util (0.1.0)
-    bsw_gpg (= 0.1.5)
+    bsw_gpg (= 0.2.1)
     yum (= 3.3.0)
   fake (1.0.0)
     apt (>= 0.0.0)
